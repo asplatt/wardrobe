@@ -1,0 +1,45 @@
+export const C = {
+  bg: '#f2f2f7',
+  bgCard: '#ffffff',
+  bgElevated: '#ffffff',
+  border: '#e5e5ea',
+  borderLight: '#d1d1d6',
+  accent: '#000000',
+  accentSub: '#6c6c70',
+  text: '#1c1c1e',
+  textSub: '#3a3a3c',
+  muted: '#8e8e93',
+  danger: '#ff3b30',
+  dangerBg: 'rgba(255,59,48,0.1)',
+  success: '#34c759',
+  successBg: 'rgba(52,199,89,0.1)',
+  warning: '#ff9500',
+} as const;
+
+export const S = {
+  card: {
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#e5e5ea',
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 10,
+  },
+  label: {
+    fontSize: 11,
+    fontWeight: '700' as const,
+    textTransform: 'uppercase' as const,
+    letterSpacing: 0.8,
+    color: '#8e8e93',
+    marginBottom: 8,
+  },
+  input: {
+    backgroundColor: '#f2f2f7',
+    borderWidth: 1,
+    borderColor: '#e5e5ea',
+    borderRadius: 12,
+    padding: 13,
+    color: '#1c1c1e',
+    fontSize: 16,
+  },
+};

@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "Wardrobe",
+    "slug": "wardrobe-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0a0a0a"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.adamrosenblatt.wardrobe",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Used to photograph clothing items for your wardrobe.",
+        "NSPhotoLibraryUsageDescription": "Used to select clothing photos from your library."
+      }
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Wardrobe to use your camera."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Wardrobe to access your photos."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "6afe47ed-ceaa-4173-814b-34429502f99c"
+      }
+    },
+    "owner": "asplatt"
+  }
+}
