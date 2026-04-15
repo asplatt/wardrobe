@@ -1,13 +1,13 @@
 import React, { useState, useRef } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, TextInput,
-  Image, ActivityIndicator, StyleSheet, Alert, Modal,
+  Image, ActivityIndicator, StyleSheet, Alert, Modal, ActionSheetIOS, Platform,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useNavigation } from '@react-navigation/native';
 import { C, S } from '../theme';
-import { uploadPhoto, analyzePhoto, lookupProduct, saveItem, getBrands } from '../api';
+import { uploadPhoto, analyzePhoto, lookupProduct, saveItem, getBrands, BASE_URL, photoUrl } from '../api';
 import PillSelector from '../components/PillSelector';
 import ColorPills from '../components/ColorPills';
 
@@ -39,7 +39,41 @@ export default function AddItemScreen() {
   const [colors, setColors] = useState<string[]>([]);
   const [seasons, setSeasons] = useState<string[]>(['spring', 'summer', 'fall', 'winter']);
   const [tags, setTags] = useState<string[]>([]);
+  async function takePhoto() {
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ['images'],
+      quality: 0.85,
+    });
+    if (result.canceled) return;
+    const uri = result.assets[0].uri;
+    setPhoto(uri);
+    await uploadAndAnalyze(uri);
+  }
 
+  function choosePhotoSource() {
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ['Cancel', 'Take Photo', 'Choose from Library'],
+          cancelButtonIndex: 0,
+        },
+        (buttonIndex) => {
+          if (buttonIndex === 1) {
+            void takePhoto();
+          } else if (buttonIndex === 2) {
+            void pickPhoto();
+          }
+        }
+      );
+      return;
+    }
+
+    Alert.alert('Add Photo', 'Choose a photo source', [
+      { text: 'Take Photo', onPress: () => void takePhoto() },
+      { text: 'Choose from Library', onPress: () => void pickPhoto() },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
+  }
   async function pickPhoto() {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'], quality: 0.85,
@@ -109,6 +143,11 @@ export default function AddItemScreen() {
         const photoColorSnapshot = [...colors];
         fillForm(data, true);
         if (photoColorSnapshot.length) setColors(photoColorSnapshot);
+        // If backend downloaded a product image, show it and stage it
+        if (data.staged_photo_id && !photo) {
+          setStagedId(data.staged_photo_id);
+          setPhoto(`${BASE_URL}/photos/staged/${data.staged_photo_id}`);
+        }
         setAiStatus('✓ Filled from web search');
       }
     } catch {}
@@ -149,7 +188,7 @@ export default function AddItemScreen() {
     <ScrollView style={st.screen} contentContainerStyle={st.content} keyboardShouldPersistTaps="handled">
 
       {/* Photo */}
-      <TouchableOpacity style={[st.photoZone, photo && st.photoZoneFilled]} onPress={pickPhoto}>
+      <TouchableOpacity style={[st.photoZone, photo && st.photoZoneFilled]} onPress={choosePhotoSource}>
         {photo
           ? <Image source={{ uri: photo }} style={st.photoPreview} />
           : <View style={st.photoPlaceholder}>
@@ -168,8 +207,8 @@ export default function AddItemScreen() {
             onChangeText={setLookupQuery} placeholder="e.g. Levi 514, Nike AF1…"
             placeholderTextColor={C.muted}
             onSubmitEditing={() => doLookup(lookupQuery)} returnKeyType="search" />
-          <TouchableOpacity style={st.scanBtn} onPress={openScanner}>
-            <Text style={st.scanBtnText}>⬛</Text>
+                    <TouchableOpacity style={st.scanBtn} onPress={openScanner}>
+            <Text style={st.scanBtnText}>📷</Text>
           </TouchableOpacity>
           <TouchableOpacity style={st.searchBtn} onPress={() => doLookup(lookupQuery)} disabled={lookupLoading}>
             {lookupLoading ? <ActivityIndicator color={C.bg} size="small" /> : <Text style={st.searchBtnText}>Go</Text>}
